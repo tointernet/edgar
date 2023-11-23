@@ -15,13 +15,15 @@ import (
 )
 
 type Container struct {
-	cfgs               *configs.Configs
-	logger             logging.Logger
-	sig                chan os.Signal
-	mqttClient         mqtt.MQTTClient
-	prometheus         metrics.PrometheusMetrics
-	prometheusShotdown func(context.Context) error
-	tinyHTTPServer     tinyHttp.TinyServer
+	Cfgs               *configs.Configs
+	Logger             logging.Logger
+	Sig                chan os.Signal
+	MqttClient         mqtt.MQTTClient
+	MqttDispatcher     mqtt.MQTTDispatcher
+	MqttPublisher      mqtt.MQTTPublisher
+	Prometheus         metrics.PrometheusMetrics
+	PrometheusShotdown func(context.Context) error
+	TinyHTTPServer     tinyHttp.TinyServer
 }
 
 func NewContainer() (*Container, error) {
@@ -40,25 +42,28 @@ func NewContainer() (*Container, error) {
 		return nil, err
 	}
 
-	mqttClient, err := provideMQTTClient(cfgs, logger)
+	mqttClient, mqttDispatcher, mqttPublisher, err := provideMQTTClient(cfgs, logger)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Container{
-		cfgs:               cfgs,
-		logger:             logger,
-		sig:                sig,
-		mqttClient:         mqttClient,
-		prometheus:         prometheusProvider,
-		prometheusShotdown: shutdown,
-		tinyHTTPServer:     tinyServer,
+		Cfgs:               cfgs,
+		Logger:             logger,
+		Sig:                sig,
+		MqttClient:         mqttClient,
+		MqttDispatcher:     mqttDispatcher,
+		MqttPublisher:      mqttPublisher,
+		Prometheus:         prometheusProvider,
+		PrometheusShotdown: shutdown,
+		TinyHTTPServer:     tinyServer,
 	}, nil
 }
 
 func provideConfigsAndLogger() (*configs.Configs, logging.Logger, error) {
 	cfgs, err := configsbuilder.NewConfigsBuilder().
 		MQTT().
+		HTTP().
 		Metrics().
 		Build()
 
@@ -107,16 +112,19 @@ func provideTinyServer(cfgs *configs.Configs, logger logging.Logger) (chan os.Si
 	return sig, tinyServer, nil
 }
 
-func provideMQTTClient(cfgs *configs.Configs, logger logging.Logger) (mqtt.MQTTClient, error) {
+func provideMQTTClient(cfgs *configs.Configs, logger logging.Logger) (mqtt.MQTTClient, mqtt.MQTTDispatcher, mqtt.MQTTPublisher, error) {
 	logger.Debug("connecting to mqtt...")
 
 	mqttClient := mqtt.NewMQTTClient(cfgs, logger)
 	err := mqttClient.Connect()
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
 
 	logger.Debug("mqtt connected!")
 
-	return mqttClient, err
+	dispatcher := mqtt.NewMQTTDispatcher(logger, mqttClient.Client())
+	publisher := mqtt.NewMQTTPublisher(logger, mqttClient.Client())
+
+	return mqttClient, dispatcher, publisher, err
 }
