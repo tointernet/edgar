@@ -3,6 +3,7 @@ module github.com/tointernet/edgar
 go 1.21.4
 
 require (
+	github.com/confluentinc/confluent-kafka-go v1.9.2
 	github.com/ralvescosta/gokit/configs v1.16.0
 	github.com/ralvescosta/gokit/configs_builder v1.16.0
 	github.com/ralvescosta/gokit/logging v1.16.0
