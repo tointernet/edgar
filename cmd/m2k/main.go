@@ -1,28 +1,115 @@
 package main
 
 import (
+	"fmt"
+	"log"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
-func main() {
-	conf := kafka.ConfigMap{}
-	conf.SetKey("bootstrap.servers", "localhost:9092")
+var (
+	topic = "test"
+)
 
-	topic := "test"
-	p, err := kafka.NewProducer(&conf)
+func main() {
+	forever := make(chan os.Signal, 1)
+	signal.Notify(forever, syscall.SIGINT, syscall.SIGTERM)
+
+	consumer()
+	producer()
+
+	<-forever
+	log.Println("RECEIVED SIGTERM, FINISHING THE APPLICATION")
+}
+
+func consumer() {
+	log.Println("[consumer] connection to kafka...")
+
+	consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
+		"bootstrap.servers":  "localhost:9094",
+		"group.id":           "basic-consumer",
+		"session.timeout.ms": 6000,
+	})
+
 	if err != nil {
-		panic(err)
+		log.Fatal("[consumer] connection failure", err)
 	}
 
-	p.Produce(&kafka.Message{
+	log.Println("[consumer] connected...")
+
+	log.Println("[consumer] subscribing to a topic...")
+	consumer.SubscribeTopics([]string{topic}, nil)
+	log.Println("[consumer] subscripted!")
+
+	go func() {
+		for {
+			ev := consumer.Poll(100)
+			if ev == nil {
+				fmt.Print(".")
+				continue
+			}
+
+			fmt.Print("\n")
+			switch e := ev.(type) {
+			case *kafka.Message:
+				log.Println("[consumer] received message!")
+				log.Printf("[consumer] topic: \"%v\", value: \"%v\"\n", *e.TopicPartition.Topic, string(e.Value))
+			case kafka.Error:
+				// Errors should generally be considered
+				// informational, the client will try to
+				// automatically recover.
+				fmt.Fprintf(os.Stderr, "%% Error: %v: %v\n", e.Code(), e)
+			default:
+				log.Printf("[consumer] Ignored event - %v\n", e)
+			}
+		}
+	}()
+}
+
+func producer() {
+	log.Println("[publisher] connection to kafka...")
+
+	p, err := kafka.NewProducer(&kafka.ConfigMap{
+		"bootstrap.servers": "localhost:9094",
+		"compression.codec": "gzip",
+		"compression.type":  "gzip",
+		// "sasl.username":       "username",
+		// "sasl.password":       "password",
+		// "ssl.certificate.pem": "",
+		// "ssl.ca.pem":          "",
+	})
+	if err != nil {
+		log.Fatal("[publisher] connection failure", err)
+	}
+
+	log.Println("[publisher] connected...")
+
+	log.Println("[publisher] publishing data...")
+
+	deliveryChannel := make(chan kafka.Event, 10000)
+	err = p.Produce(&kafka.Message{
 		TopicPartition: kafka.TopicPartition{
 			Topic:     &topic,
 			Partition: kafka.PartitionAny,
 		},
-		Value: []byte{},
+		Value: []byte("oi eu sou o goku"),
 		Headers: []kafka.Header{
 			{Key: "myCustomHeader", Value: []byte("header value")},
 		},
-	}, nil)
+		Key:           []byte("eventType"),
+		Timestamp:     time.Now(),
+		TimestampType: kafka.TimestampCreateTime,
+	},
+		deliveryChannel,
+	)
 
+	if err != nil {
+		log.Fatal("[publisher] publish failure", err)
+	}
+
+	log.Println("[publisher] data was published")
 }
