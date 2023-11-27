@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	topic    = ""
+	topic    = "topic_0"
 	server   = ""
 	userName = ""
 	password = ""
@@ -23,7 +23,7 @@ func main() {
 	signal.Notify(forever, syscall.SIGINT, syscall.SIGTERM)
 
 	consumer()
-	producer()
+	// producer()
 
 	<-forever
 	log.Println("RECEIVED SIGTERM, FINISHING THE APPLICATION")
@@ -40,6 +40,7 @@ func consumer() {
 		"sasl.mechanisms":    "PLAIN",
 		"sasl.username":      userName,
 		"sasl.password":      password,
+		"enable.auto.commit": false,
 	})
 
 	if err != nil {
@@ -88,6 +89,8 @@ func producer() {
 		"sasl.mechanisms":   "PLAIN",
 		"sasl.username":     userName,
 		"sasl.password":     password,
+		"retries":           3,
+		"retry.backoff.ms":  18000,
 	})
 	if err != nil {
 		log.Fatal("[publisher] connection failure", err)
