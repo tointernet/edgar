@@ -12,7 +12,10 @@ import (
 )
 
 var (
-	topic = "test"
+	topic    = ""
+	server   = ""
+	userName = ""
+	password = ""
 )
 
 func main() {
@@ -30,9 +33,13 @@ func consumer() {
 	log.Println("[consumer] connection to kafka...")
 
 	consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers":  "localhost:9094",
+		"bootstrap.servers":  server,
 		"group.id":           "basic-consumer",
 		"session.timeout.ms": 6000,
+		"security.protocol":  "SASL_SSL",
+		"sasl.mechanisms":    "PLAIN",
+		"sasl.username":      userName,
+		"sasl.password":      password,
 	})
 
 	if err != nil {
@@ -74,13 +81,13 @@ func producer() {
 	log.Println("[publisher] connection to kafka...")
 
 	p, err := kafka.NewProducer(&kafka.ConfigMap{
-		"bootstrap.servers": "localhost:9094",
+		"bootstrap.servers": server,
 		"compression.codec": "gzip",
 		"compression.type":  "gzip",
-		// "sasl.username":       "username",
-		// "sasl.password":       "password",
-		// "ssl.certificate.pem": "",
-		// "ssl.ca.pem":          "",
+		"security.protocol": "SASL_SSL",
+		"sasl.mechanisms":   "PLAIN",
+		"sasl.username":     userName,
+		"sasl.password":     password,
 	})
 	if err != nil {
 		log.Fatal("[publisher] connection failure", err)
