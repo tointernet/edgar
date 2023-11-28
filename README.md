@@ -1,5 +1,10 @@
 # Edgar
 
+[![GitHub License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/ralvescosta/ruskit/blob/main/LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/tointernet/edgar.svg)](https://github.com/tointernet/edgar/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/tointernet/edgar.svg)](https://github.com/tointernet/edgar/network)
+[![GitHub Issues](https://img.shields.io/github/issues/tointernet/edgar.svg)](https://github.com/tointernet/edgar/issues)
+
 ## Introduction
 
 Edgar is an innovative open-source software developed in Go, designed to seamlessly translate data between MQTT and Kafka brokers. This project aims to provide a robust and efficient bridge for data communication, simplifying the integration of diverse systems and technologies.
