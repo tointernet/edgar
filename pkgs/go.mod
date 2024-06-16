@@ -13,6 +13,7 @@ require (
 	github.com/eclipse/paho.mqtt.golang v1.4.3 // indirect
 	github.com/go-chi/chi/v5 v5.0.12 // indirect
 	github.com/gorilla/websocket v1.5.1 // indirect
+	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/prometheus/client_golang v1.19.1 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.53.0 // indirect
@@ -26,6 +27,7 @@ require (
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/ralvescosta/gokit/configs_builder v1.20.0
 	github.com/ralvescosta/gokit/mqtt v1.20.0
 	github.com/ralvescosta/gokit/tiny_http v1.20.0
 	github.com/stretchr/objx v0.5.2 // indirect

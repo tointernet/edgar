@@ -4,6 +4,12 @@ install:
 	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 	@go install github.com/swaggo/swag/cmd/swag@latest
 
+workspace:
+	@go work init
+	@go work use pkgs
+	@go work use k2m_bridge
+	@go work use m2k_bridge
+
 download:
 	@echo "Downloading external packages..."
 	@for dir in ${PKGS}; do \

@@ -6,6 +6,7 @@ import (
 	"syscall"
 
 	"github.com/ralvescosta/gokit/configs"
+	configsbuilder "github.com/ralvescosta/gokit/configs_builder"
 	"github.com/ralvescosta/gokit/logging"
 	"github.com/ralvescosta/gokit/mqtt"
 	tinyHTTP "github.com/ralvescosta/gokit/tiny_http"
@@ -17,13 +18,21 @@ type (
 		Logger         logging.Logger
 		Sig            chan os.Signal
 		MQTTClient     mqtt.MQTTClient
-		MQTTPublisher  mqtt.MQTTPublisher
-		MQTTDispatcher mqtt.MQTTDispatcher
 		TinyHTTPServer tinyHTTP.TinyServer
 	}
 )
 
-func NewContainer(cfgs *configs.Configs) (*Container, error) {
+func NewContainer() (*Container, error) {
+	cfgs, err := configsbuilder.NewConfigsBuilder().
+		MQTT().
+		HTTP().
+		Metrics().
+		Build()
+
+	if err != nil {
+		return nil, err
+	}
+
 	logger, err := logging.NewDefaultLogger(cfgs.AppConfigs)
 	if err != nil {
 		return nil, err
@@ -34,7 +43,7 @@ func NewContainer(cfgs *configs.Configs) (*Container, error) {
 		return nil, err
 	}
 
-	mqttClient, mqttDispatcher, mqttPublisher, err := provideMQTTClient(cfgs, logger)
+	mqttClient, err := provideMQTTClient(cfgs, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -44,8 +53,6 @@ func NewContainer(cfgs *configs.Configs) (*Container, error) {
 		Logger:         logger,
 		Sig:            sig,
 		MQTTClient:     mqttClient,
-		MQTTDispatcher: mqttDispatcher,
-		MQTTPublisher:  mqttPublisher,
 		TinyHTTPServer: tinyServer,
 	}, nil
 }
@@ -69,19 +76,16 @@ func provideTinyServer(cfgs *configs.Configs, logger logging.Logger) (chan os.Si
 	return sig, tinyServer, nil
 }
 
-func provideMQTTClient(cfgs *configs.Configs, logger logging.Logger) (mqtt.MQTTClient, mqtt.MQTTDispatcher, mqtt.MQTTPublisher, error) {
+func provideMQTTClient(cfgs *configs.Configs, logger logging.Logger) (mqtt.MQTTClient, error) {
 	logger.Debug("connecting to mqtt...")
 
 	mqttClient := mqtt.NewMQTTClient(cfgs, logger)
 	err := mqttClient.Connect()
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, err
 	}
 
 	logger.Debug("mqtt connected!")
 
-	dispatcher := mqtt.NewMQTTDispatcher(logger, mqttClient.Client())
-	publisher := mqtt.NewMQTTPublisher(logger, mqttClient.Client())
-
-	return mqttClient, dispatcher, publisher, err
+	return mqttClient, err
 }
