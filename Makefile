@@ -1,4 +1,4 @@
-PKGS := k2m-bridge m2k-bridge
+PKGS := k2m_bridge m2k_bridge pkgs
 
 install:
 	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
