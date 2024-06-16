@@ -1,7 +1,6 @@
 package pkgs
 
 import (
-	"context"
 	"os"
 	"os/signal"
 	"syscall"
@@ -9,22 +8,21 @@ import (
 	"github.com/ralvescosta/gokit/configs"
 	configsbuilder "github.com/ralvescosta/gokit/configs_builder"
 	"github.com/ralvescosta/gokit/logging"
-	"github.com/ralvescosta/gokit/metrics"
 	"github.com/ralvescosta/gokit/mqtt"
 	tinyHTTP "github.com/ralvescosta/gokit/tiny_http"
 )
 
 type (
 	Container struct {
-		Cfgs               *configs.Configs
-		Logger             logging.Logger
-		Sig                chan os.Signal
-		MQTTClient         mqtt.MQTTClient
-		MQTTPublisher      mqtt.MQTTPublisher
-		MQTTDispatcher     mqtt.MQTTDispatcher
-		Prometheus         metrics.PrometheusMetrics
-		PrometheusShotdown func(context.Context) error
-		TinyHTTPServer     tinyHTTP.TinyServer
+		Cfgs           *configs.Configs
+		Logger         logging.Logger
+		Sig            chan os.Signal
+		MQTTClient     mqtt.MQTTClient
+		MQTTPublisher  mqtt.MQTTPublisher
+		MQTTDispatcher mqtt.MQTTDispatcher
+		// Prometheus         metrics.PrometheusMetrics
+		// PrometheusShotdown func(context.Context) error
+		TinyHTTPServer tinyHTTP.TinyServer
 	}
 )
 
