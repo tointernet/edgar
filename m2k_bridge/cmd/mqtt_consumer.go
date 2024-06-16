@@ -5,9 +5,9 @@ import (
 
 	"github.com/ralvescosta/gokit/mqtt"
 	"github.com/tointernet/edgar/pkgs"
-	"go.uber.org/zap"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"go.uber.org/zap"
 )
 
 func NewMQTTConsumer(container *pkgs.Container) error {
