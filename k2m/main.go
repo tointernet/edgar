@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/tointernet/edgar/k2m/cmd"
 	"github.com/tointernet/edgar/pkgs"
 	"go.uber.org/zap"
+
+	"github.com/tointernet/edgar/k2m/cmd"
 )
 
 func main() {
