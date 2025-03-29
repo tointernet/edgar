@@ -20,7 +20,7 @@ Edgar is an innovative open-source software developed in GoLang, designed to sea
 
 ### Prerequisites
 
-- Go (version 1.21 or higher)
+- Go (version 1.24 or higher)
 - MQTT Broker (MQTT protocol v3.1)
 - Kafka Broker
 

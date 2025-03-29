@@ -1,4 +1,4 @@
-PKGS := k2m_bridge m2k_bridge pkgs
+PKGS := k2m m2k pkgs
 
 install:
 	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
@@ -7,8 +7,8 @@ install:
 workspace:
 	@go work init
 	@go work use pkgs
-	@go work use k2m_bridge
-	@go work use m2k_bridge
+	@go work use k2m
+	@go work use m2k
 
 download:
 	@echo "Downloading external packages..."
