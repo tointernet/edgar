@@ -3,16 +3,12 @@ package cmd
 import (
 	"time"
 
-	"github.com/ralvescosta/gokit/mqtt"
-	"github.com/tointernet/edgar/pkgs"
-
 	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"github.com/tointernet/edgar/pkgs"
 	"go.uber.org/zap"
 )
 
 func NewMQTTConsumer(container *pkgs.Container) error {
-	container.MQTTDispatcher = mqtt.NewMQTTDispatcher(container.Logger, container.MQTTClient.Client())
-
 	container.Logger.Debug("[publisher] connection to kafka...")
 
 	server, username, password, topic := "", "", "", ""

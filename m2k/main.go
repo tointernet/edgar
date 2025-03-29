@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/tointernet/edgar/m2k/cmd"
 	"github.com/tointernet/edgar/pkgs"
 	"go.uber.org/zap"
+
+	"github.com/tointernet/edgar/m2k/cmd"
 )
 
 func main() {
@@ -16,5 +17,5 @@ func main() {
 		container.Logger.Fatal("failed to run commands", zap.Error(err))
 	}
 
-	<-container.Sig
+	container.MQTTDispatcher.ConsumeBlocking(container.Sig)
 }
